@@ -3,7 +3,7 @@
 # simple examples of using DNS to get host IPs
 import socket
 try:
-    domain='www.imperial.ac.uk'
+    domain='poets-project.org'
     # get the IP addresses of a host name
     # ip = socket.gethostbyname('www.soton.ac.uk')
     print("getaddrinfo() for " + domain)
