@@ -1,6 +1,10 @@
 # IPv6 Lab Experience
 
-This is an example of a basic networking lab that embraces the IPv6-first ethos of teaching computer networking to students. This is based on an amalgamation of two assessed lab that all Part I CS students do. The students are given learning outcomes focused on their use of Wireshark, but this lab exposes them to IPv6, routing, network tools, telnet and basic networking skills:
+This is an example of a basic networking lab that embraces the IPv6-first ethos of teaching computer networking to students. This is based on an amalgamation of two assessed lab that all Part I CS students do. 
+
+The lab is designed to run under WSL2 on Windows 11 (at lease 22H2) with somewhat limited permissions on the host. You should be able to make most of this work under Linux or MacOS.
+
+The students are given learning outcomes focused on their use of Wireshark and sockets, but the lab exposes them to IPv6, routing, network tools, telnet and basic networking skills:
 
 This laboratory exercise aims to:
 * Give you experience using the Wireshark packet sniffer
@@ -59,7 +63,11 @@ We now need to install some pre-requisites:
 
 ❇️ 	In the Linux environment, enter `sudo apt update` and enter your password when prompted. This will update the package cache.
 
-❇️ 	Install the dependencies for this lab by typing `sudo apt install traceroute python3 python3-scapy curl wget dnsutils telnet netcat-openbsd nmap sl`.
+❇️ 	Install the dependencies for this lab by typing `sudo apt install traceroute python3 python3-scapy python3-venv curl wget dnsutils telnet netcat-openbsd wireshark sl`.
+
+Note that you will want to allow non-superusers to be able to capture packets with Dumpcap (Select "yes" on the popup):
+
+![Dumpcap config](dumpcap.png)
 
 We can check that everything is happy by typing `{ sleep 1; echo "bye"; } | nc -C comp1323.m0nsa.com 5666` into the Linux environment, which will give output similar to this:
 
@@ -67,9 +75,7 @@ We can check that everything is happy by typing `{ sleep 1; echo "bye"; } | nc -
 
 ## Wireshark
 
-We will be using Wireshark to inspect packets in this lab. Ideally you will have Wireshark installed natively. If you don't and you are using WSL, you can install it within WSL with `sudo apt install wireshark`. Note that you will want to allow non-superusers to be able to capture packets with Dumpcap (Select "yes" on the popup):
-
-![Dumpcap config](dumpcap.png)
+We will be using Wireshark to inspect packets in this lab. WE will need to run Wireshark under WSL for Sections 4 and 5, but you can run it natively for the other exercises. 
 
 Before we can start capturing packets, we need to figure out which interface our traffic will be using.
 
@@ -255,9 +261,11 @@ If you wish to use an IDE rather than `nano` at the command line, you can use Vi
 
 ## TCP Exercise
 
-❇️ 	Start a Wireshark capture on the "any" interface and apply a display filter that only shows IPv6 traffic involving `::1`.
+❇️ 	Open a WSL terminal and start `wireshark`.
 
-❇️ 	In a new WSL terminal, execute `simpleserver.py`.
+❇️ Start a Wireshark capture on the "any" interface and apply a display filter that only shows IPv6 traffic involving `::1`. The "any" interface is not a feature on Wireshark on Windows and the host doesn't always see link-local traffic inside WSL, which is why we need to run Wireshark in WSL for this task.
+
+❇️ 	In a new WSL terminal, activate the venv and execute `simpleserver.py`.
 
 `simpleserver.py` is an example of a simple server that listens on a specified port and sends back a short message when a client connects. Have a look at the code in your editor of choice.
 
@@ -265,10 +273,43 @@ If you wish to use an IDE rather than `nano` at the command line, you can use Vi
 
 You now need to connect to this server with a simple client.
 
-❇️ 	Execute `simpleclient.py` twice and note the output from the server.
+❇️ Open a second WSL terminal, activate the environment and execute `simpleclient.py` twice and note the output from the server.
 
 ❓ 	What do you notice about the client source ports reported by the server? Is the source port the same each time?
 
 ❓ 	Note how many packets your client-server interaction caused in Wireshark.
 
 This is a good reminder of the TCP setup and tear-down. Which number packet contains the "thank you..." message from the server? (look at packet containing the Data (24 bytes) )
+
+# 5. UDP
+
+Students get to see a lot of TCP, but understanding UDP is an important skill as well, especially with the growing prevelance of QUIC. In this exercise you are going to explore UDP client and server communications.
+
+❇️ 	Stop the `simpleserver.py`.
+
+❇️ 	Execute `simpleserverUDP.py`.
+
+`simpleserverUDP.py` is an example of a simple UDP server that listens on a specified port. Unlike the TCP example, the server does not reply to the client.
+
+Have a look at the code in your editor of choice.
+
+❓ 	What port does the server listen on?
+
+You now need to send data to this server with a simple client.
+
+❇️ 	Execute `simpleclientUDP.py` twice and look at the packets in Wireshark. 
+
+❓ 	What do you notice about the client source ports reported by the server? Is the source port the same each time?
+
+❓ 	How many packets does one client-send trigger?
+
+❓ 	You sent a 13 byte message but how many bytes is the whole Frame?
+
+
+UDP supports two-way communication as well. Think about how you can change the client and server to have similar behaviour to the TCP implementation.
+
+❇️ 	Modify simpleclientUDP.py and simpleserverUDP.py so that:
+* the server sends a response of "Hello, client" to each client.
+* the client prints the server response. 
+
+**Hint:** The Client holds the answer to a Server sending a message, and the Server holds the answer for the Client receiving a message.
