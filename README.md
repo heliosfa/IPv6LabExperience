@@ -342,3 +342,29 @@ You should see that a response for Google or Microsoft are markedly different to
 ❓ 	What is different about the response you receive for Google or Microsoft?
 
 ❓ 	Do you see anything different when you run it a second time? How about a third and fourth time?
+
+# Using VSCode with WSL
+
+Open Visual Studio Code.
+
+Click the remoting symbol in the bottom left then "Connect to WSL":
+
+![VSCode: Connecting to WSL](images/vscode1.png)
+
+Click Explorer and "Open Folder":
+
+![VSCode: Opening folder](images/vscode2.png)
+
+Select your home directory and make sure you can see the venv:
+
+![VSCode: Home directory](images/vscode3.png)
+
+At this point it may prompt you to install the Python extension, do so. Or you can install it manually through the extensions:
+
+![VSCode: Python extension](images/vscode4.png)
+
+When you open a terminal in VSCode, it should show you that the venv is in use:
+
+![VSCode: terminal](images/vscode5.png)
+
+
