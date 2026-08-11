@@ -1,19 +1,21 @@
 # IPv6 Lab Experience
 
-This is an example of a basic networking lab that embraces the IPv6-first ethos of teaching computer networking to students. This is based on an assessed lab that all Part I CS students do. The students are given learning outcomes focused on their use of Wireshark, but this lab exposes them to IPv6, routing, network tools, telnet and basic networking skills:
+This is an example of a basic networking lab that embraces the IPv6-first ethos of teaching computer networking to students. This is based on an amalgamation of two assessed lab that all Part I CS students do. The students are given learning outcomes focused on their use of Wireshark, but this lab exposes them to IPv6, routing, network tools, telnet and basic networking skills:
 
 This laboratory exercise aims to:
 * Give you experience using the Wireshark packet sniffer
 * Give you some basic Linux experience
+* Familiarise you with simple client/server socket-based communications.
 
 Having successfully completed the lab, you will be able to:
 * Use Wireshark to intercept and analyse network traffic
 * Construct appropriate Wireshark Display Filters to limit the information presented by Wireshark.
 * Construct appropriate Wireshark Capture Filters to limit the information captured by Wireshark.
+* Create and use sockets in simple Python applications.
 
 For students taking the lab, assessment is done using two Moodle tests/quizzes that are automatically marked. The first is preparation that they complete before the lab, the second is progress and understanding that they complete in the final ~30 minutes of the lab.
 
-Steps to follow are marked with a ❇️.  Things for students to explore and note in their logbook are marked with a ❓ (this is stuff that students might need to answer the end of lab quiz)
+Steps to follow are marked with a ❇️. Things for students to explore and note in their logbook are marked with a ❓ (this is stuff that students might need to answer the end of lab quiz)
 
 # 1. Setting Up 
 This lab will give you an introduction to using Wireshark to investigate network packets and to see how different protocols behave. You will also gain some experience of using some simple Linux networking tools. All of the exercises in this lab will be done over IPv6.
@@ -54,7 +56,9 @@ If you don't see IPv6 addresses and have the config in-place as `%USERPROFILE%\.
 ❓ 	Note down the interface name that has the global address.
 
 We now need to install some pre-requisites:
+
 ❇️ 	In the Linux environment, enter `sudo apt update` and enter your password when prompted. This will update the package cache.
+
 ❇️ 	Install the dependencies for this lab by typing `sudo apt install traceroute python3 python3-scapy curl wget dnsutils telnet netcat-openbsd nmap sl`.
 
 We can check that everything is happy by typing `{ sleep 1; echo "bye"; } | nc -C comp1323.m0nsa.com 5666` into the Linux environment, which will give output similar to this:
@@ -74,8 +78,11 @@ Before we can start capturing packets, we need to figure out which interface our
 ![Wireshark interfaces](wireshark.png)
 
 Let's check that we have the correct interface.  
+
 ❇️ 	Start a capture on the interface that you think is the right one. You should see lots of packets scrolling through the window.
+
 ❇️ 	Enter `ipv6.addr == 2600::` in the box that says "Apply a display filter..." and press enter. You should have an empty window.
+
 ❇️ 	In your Linux terminal, run `ping -c5 2600::`. You should see some packets appear in Wireshark.
 Investigate these packets by expanding the fields in the Packet Details pane in the lower left of Wireshark.
 
@@ -99,9 +106,13 @@ You should now have a configured WSL guest and running Wireshark capture.
 A little earlier you used `nc` to connect to a little demo Python server that listens on TCP port 5666 and sends back the IP address and source port it sees. If you want to have a look at the server, you can download the script here.
 
 We can do the same thing over IPv4 while we sniff the traffic in Wireshark to see what NAT is doing to our connection.
+
 ❇️ 	Stop the capture and start it again with no capture filter.
+
 ❇️ 	Change your display filter to `tcp.port==5666`.
+
 ❇️ 	In your Linux terminal, run `{ sleep 1; echo "bye"; } | nc -C comp1323.m0nsa.com 5666`. You should some packets appear in Wireshark.
+
 ❇️ 	In your Linux terminal, run `{ sleep 1; echo "bye"; } | nc -4 -C poets-project.org 5666`. You should some more packets appear in Wireshark, but involving IPv4 addresses. This command will print an IPv6-mapped IPv4 address, you can ignore the "`::ffff:`" at the start.
 
 If you explore the packets a little, you should see that the line printed when you sent packets to the server over IPv6 matches what you see in Wireshark whereas the packets sent over IPv4 involve different IP addresses and ports.
@@ -212,5 +223,52 @@ This _traceroute_ should have completed and you should be able to see the differ
 
 ❓ 	Think about why `www.imperial.ac.uk` exhibits the behaviour it does with the default protocol used by _traceroute_.
 
-
 You should now have more of an idea of how Traceroute works and how Wireshark can help us to investigate the behaviour of network protocols.
+
+# 4. TCP
+
+In the introductory lab that all of these exercises have come from so far, students would now go on to explore Router Advertisements, Neighbour Discovery and NMAP. Multicast on WiFI is always a little finickity and I'm not sure Imperial would like us all doing port scans so we are going to explore TCP and UDP instead. Sections 4 and 5 are sourced from a second lab that leads students to writing an IPv6 UDP chat app (yes, it works with multicast and yes we have had multicast ASCII Rick Rolling...)
+
+In this exercise you are going to investigate a simple TCP client/server, similar to what you have seen in the preparation.
+
+## Lab Code & Virtual Environment
+
+You need to download the code for this lab in WSL and untar it.
+
+❇️ 	Make sure you are in WSL's home directory (`~` and not `/mnt/c/Users/<username>`). you can get there by entering `cd.`
+
+❇️ 	In the Linux environment, enter `wget comp1323.m0nsa.com/n2.tar.gz`
+
+❇️ 	Untar the file by entering `tar -zxvf n2.tar.gz` to unpack the contents of the tarball into the current directory.
+
+**Note:** These files do NOT have Shebangs, so you cannot execute them with `./<filename>`. You will need to do `python3 <filename>` for any files you wish to execute.
+
+We will need a Python venv for installing packages later on, so let's create this now.
+
+❇️ 	Enter `python3 -m venv n2venv`.
+
+❇️ 	Activate the environment by typing `source ./n2venv/bin/activate`
+
+**Note:** You will need to have this venv active in any new terminals that you open, so run the above source line any time you open a new one.
+
+If you wish to use an IDE rather than `nano` at the command line, you can use Visual Studio Code on the Windows host to interact with the WSL environment. Instructions at the end of these notes and a helpful guide [here](https://code.visualstudio.com/docs/remote/wsl).
+
+## TCP Exercise
+
+❇️ 	Start a Wireshark capture on the "any" interface and apply a display filter that only shows IPv6 traffic involving `::1`.
+
+❇️ 	In a new WSL terminal, execute `simpleserver.py`.
+
+`simpleserver.py` is an example of a simple server that listens on a specified port and sends back a short message when a client connects. Have a look at the code in your editor of choice.
+
+❓ 	What port does the server listen on?
+
+You now need to connect to this server with a simple client.
+
+❇️ 	Execute `simpleclient.py` twice and note the output from the server.
+
+❓ 	What do you notice about the client source ports reported by the server? Is the source port the same each time?
+
+❓ 	Note how many packets your client-server interaction caused in Wireshark.
+
+This is a good reminder of the TCP setup and tear-down. Which number packet contains the "thank you..." message from the server? (look at packet containing the Data (24 bytes) )
