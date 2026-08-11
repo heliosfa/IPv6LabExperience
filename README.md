@@ -1,4 +1,4 @@
-# Lab Experience Intro
+# IPv6 Lab Experience
 
 This is an example of a basic networking lab that embraces the IPv6-first ethos of teaching computer networking to students. This is based on an assessed lab that all Part I CS students do. The students are given learning outcomes focused on their use of Wireshark, but this lab exposes them to IPv6, routing, network tools, telnet and basic networking skills:
 
@@ -22,9 +22,9 @@ This lab will give you an introduction to using Wireshark to investigate network
 
 If you are using Windows for this lab, we need to set up a WSL environment that makes use of [mirrored mode networking](https://learn.microsoft.com/en-us/windows/wsl/networking#mirrored-mode-networking). This needs Windows 11 22H2 or newer. To do this:
 
- ❇️ 	Download .wslconfig and copy it to `%USERPROFILE%`. If using file browser this is you home folder.
+ ❇️ 	Download [.wslconfig](http://comp1323.m0nsa.com/.wslconfig) and copy it to `%USERPROFILE%`. If using file browser this is you home folder.
 
-**NOTE:** When you download this file, make sure its name includes dot like ".wslconfig" and not "wslconfig"
+**NOTE:** When you download this file, make sure its name includes dot like ".wslconfig" and not just "wslconfig"
 
 This config file enables mirrored mode networking for all WSL2 guests and places the Linux environment directly on the same network as the host. `%USERPROFILE%` is an alias for the root of your user profile directory (usually C:\Users\<username>). Enter `%USERPROFILE%` in the Windows Explorer address bar to be taken there.
 
@@ -139,7 +139,7 @@ Also investigate the Telnet data packets and note how the contents relate to wha
 
 ❓ 	How many packets were involved in closing the connection?
 
-3. Traceroute
+# 3. Traceroute
 
 Many students will have come across `traceroute` at some point. This exercise lets them see how the utility works at the packet level and explore how the Hop Limit/TTL works. These instructions are written for a Linux environment, you can adapt them for Windows or Mac without too much difficulty.
 
