@@ -53,7 +53,7 @@ Enter a username (your University username would be a good choice) and then a pa
 
 You now have Linux running on top of Windows with the same networking provision as the Windows host. We can check this by looking at the IP addresses shown on the post-installation welcome screen or by entering ip a. If the networking is configured correctly, then you should see IPv6 addresses that start with `2001:630:d0:...` like the screenshot below. 
 
-![WSL window showing IPv6 Addresses](addresses.png)
+![WSL window showing IPv6 Addresses](images/addresses.png)
 
 If you don't see IPv6 addresses and have the config in-place as `%USERPROFILE%\.wslconfig` (yes, the "." is important), then you need to restart the WSL instance. Close the WSL window and open a Powershell window. Type `wsl --shutdown`, and then re-open WSL by clicking the arrow to the right of your Powershell tab and then clicking IPv6Lab (you could also try pressing `ctrl + shift + 4` or `ctrl + shift + 5` and seeing what that does).
 
@@ -67,11 +67,11 @@ We now need to install some pre-requisites:
 
 Note that you will want to allow non-superusers to be able to capture packets with Dumpcap (Select "yes" on the popup):
 
-![Dumpcap config](dumpcap.png)
+![Dumpcap config](images/dumpcap.png)
 
 We can check that everything is happy by typing `{ sleep 1; echo "bye"; } | nc -C comp1323.m0nsa.com 5666` into the Linux environment, which will give output similar to this:
 
-![nc output](nc.png)
+![nc output](images/nc.png)
 
 ## Wireshark
 
@@ -81,7 +81,7 @@ Before we can start capturing packets, we need to figure out which interface our
 
  ❇️ 	Open Wireshark and watch the graphs shown next to each interface for a moment. It should be the only real interface with a moving line next to it. If it's not clear, open your browser and go to fast.com and see which line shows traffic.
 
-![Wireshark interfaces](wireshark.png)
+![Wireshark interfaces](images/wireshark.png)
 
 Let's check that we have the correct interface.  
 
@@ -94,13 +94,13 @@ Investigate these packets by expanding the fields in the Packet Details pane in 
 
 **Note:** there is a bug in WSL's IPv6 networking stack that means you may see ICMPv6 "Parameter Problem" messages when capturing ping replies destined for WSL. You can safely ignore these.
 
-![Wireshark capture](wireshark2.png)
+![Wireshark capture](images/wireshark2.png)
 
 ❓ 	Note down the ASCII representation of the last eight bytes of data that ping included in the ICMPv6 Echo request packets.
 
 The Wireshark window has a few different elements that we will be making use of during the lab. The screenshot below highlights the important fields that we will be using:
 
-![Wireshark capture](wireshark3.png)
+![Wireshark capture](images/wireshark3.png)
 
 
 You may want to arrange your display into a 3-way split so that you can see these notes, your Linux terminal and Wireshark. The Windows 11 Window Manager lets you [snap your windows into various arrangements](https://support.microsoft.com/en-gb/windows/snap-your-windows-885a9b1e-a983-a3b1-16cd-c531795e6241) - hover your mouse over the Minimise or Maximise button and the layout box will pop up. The layout with an equal 3-way split works well on the Level 3 Lab PCs.
