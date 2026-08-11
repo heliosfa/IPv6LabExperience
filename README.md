@@ -46,3 +46,5 @@ Enter a username (your University username would be a good choice) and then a pa
 *Note:* If you have installed Debain (or certain other distributions), you will need to set permissions to allow ping to work. Do this by entering `sudo setcap cap_net_raw+p /bin/ping`
 
 You now have Linux running on top of Windows with the same networking provision as the Windows host. We can check this by looking at the IP addresses shown on the post-installation welcome screen or by entering ip a. If the networking is configured correctly, then you should see IPv6 addresses that start with `2001:630:d0:...` like the screenshot below. 
+
+![WSL window showing IPv6 Addresses](addresses.png)
