@@ -239,15 +239,11 @@ In this exercise you are going to investigate a simple TCP client/server, simila
 
 ## Lab Code & Virtual Environment
 
-You need to download the code for this lab in WSL and untar it.
+You need to download the code for this lab in WSL. You can either clone this repository or `wget` individual files.
 
 ❇️ 	Make sure you are in WSL's home directory (`~` and not `/mnt/c/Users/<username>`). you can get there by entering `cd.`
 
-❇️ 	In the Linux environment, enter `wget comp1323.m0nsa.com/n2.tar.gz`
-
-❇️ 	Untar the file by entering `tar -zxvf n2.tar.gz` to unpack the contents of the tarball into the current directory.
-
-**Note:** These files do NOT have Shebangs, so you cannot execute them with `./<filename>`. You will need to do `python3 <filename>` for any files you wish to execute.
+❇️ 	Download the `simpleserver.py`, `simpleclient.py`, `simpleserverUDP.py`, `simpleclientUDP.py` and `simplegetaddrinfo.py` example files in the Linux environment. e.g. `wget https://raw.githubusercontent.com/heliosfa/IPv6LabExperience/simpleserver.py`
 
 We will need a Python venv for installing packages later on, so let's create this now.
 
