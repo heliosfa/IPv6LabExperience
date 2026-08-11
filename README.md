@@ -24,7 +24,7 @@ If you are using Windows for this lab, we need to set up a WSL environment that 
 
  ❇️ 	Download .wslconfig and copy it to `%USERPROFILE%`. If using file browser this is you home folder.
 
-*NOTE:* When you download this file, make sure its name includes dot like ".wslconfig" and not "wslconfig"
+**NOTE:** When you download this file, make sure its name includes dot like ".wslconfig" and not "wslconfig"
 
 This config file enables mirrored mode networking for all WSL2 guests and places the Linux environment directly on the same network as the host. `%USERPROFILE%` is an alias for the root of your user profile directory (usually C:\Users\<username>). Enter `%USERPROFILE%` in the Windows Explorer address bar to be taken there.
 
@@ -43,7 +43,7 @@ Once you have the config file, open a Powershell terminal and install a Linux di
 ❇️ 	Once installed, your terminal will end up in the Linux environment and you will be prompted to "Enter a new UNIX username".
 Enter a username (your University username would be a good choice) and then a password when prompted.
 
-*Note:* If you have installed Debain (or certain other distributions), you will need to set permissions to allow ping to work. Do this by entering `sudo setcap cap_net_raw+p /bin/ping`
+**Note:** If you have installed Debain (or certain other distributions), you will need to set permissions to allow ping to work. Do this by entering `sudo setcap cap_net_raw+p /bin/ping`
 
 You now have Linux running on top of Windows with the same networking provision as the Windows host. We can check this by looking at the IP addresses shown on the post-installation welcome screen or by entering ip a. If the networking is configured correctly, then you should see IPv6 addresses that start with `2001:630:d0:...` like the screenshot below. 
 
@@ -61,7 +61,7 @@ We can check that everything is happy by typing `{ sleep 1; echo "bye"; } | nc -
 
 ![nc output](nc.png)
 
-# 2. Wireshark
+## Wireshark
 
 We will be using Wireshark to inspect packets in this lab. Ideally you will have Wireshark installed natively. If you don't and you are using WSL, you can install it within WSL with `sudo apt install wireshark`. Note that you will want to allow non-superusers to be able to capture packets with Dumpcap (Select "yes" on the popup):
 
@@ -71,4 +71,146 @@ Before we can start capturing packets, we need to figure out which interface our
 
  ❇️ 	Open Wireshark and watch the graphs shown next to each interface for a moment. It should be the only real interface with a moving line next to it. If it's not clear, open your browser and go to fast.com and see which line shows traffic.
 
- ![Wireshark interfaces](wireshark.png)
+![Wireshark interfaces](wireshark.png)
+
+Let's check that we have the correct interface.  
+❇️ 	Start a capture on the interface that you think is the right one. You should see lots of packets scrolling through the window.
+❇️ 	Enter `ipv6.addr == 2600::` in the box that says "Apply a display filter..." and press enter. You should have an empty window.
+❇️ 	In your Linux terminal, run `ping -c5 2600::`. You should see some packets appear in Wireshark.
+Investigate these packets by expanding the fields in the Packet Details pane in the lower left of Wireshark.
+
+**Note:** there is a bug in WSL's IPv6 networking stack that means you may see ICMPv6 "Parameter Problem" messages when capturing ping replies destined for WSL. You can safely ignore these.
+
+![Wireshark capture](wireshark2.png)
+
+❓ 	Note down the ASCII representation of the last eight bytes of data that ping included in the ICMPv6 Echo request packets.
+
+The Wireshark window has a few different elements that we will be making use of during the lab. The screenshot below highlights the important fields that we will be using:
+
+![Wireshark capture](wireshark3.png)
+
+
+You may want to arrange your display into a 3-way split so that you can see these notes, your Linux terminal and Wireshark. The Windows 11 Window Manager lets you [snap your windows into various arrangements](https://support.microsoft.com/en-gb/windows/snap-your-windows-885a9b1e-a983-a3b1-16cd-c531795e6241) - hover your mouse over the Minimise or Maximise button and the layout box will pop up. The layout with an equal 3-way split works well on the Level 3 Lab PCs.
+
+You should now have a configured WSL guest and running Wireshark capture. 
+
+## A NAT Sidequest (Optional, for extra understanding)
+
+A little earlier you used `nc` to connect to a little demo Python server that listens on TCP port 5666 and sends back the IP address and source port it sees. If you want to have a look at the server, you can download the script here.
+
+We can do the same thing over IPv4 while we sniff the traffic in Wireshark to see what NAT is doing to our connection.
+❇️ 	Stop the capture and start it again with no capture filter.
+❇️ 	Change your display filter to `tcp.port==5666`.
+❇️ 	In your Linux terminal, run `{ sleep 1; echo "bye"; } | nc -C comp1323.m0nsa.com 5666`. You should some packets appear in Wireshark.
+❇️ 	In your Linux terminal, run `{ sleep 1; echo "bye"; } | nc -4 -C poets-project.org 5666`. You should some more packets appear in Wireshark, but involving IPv4 addresses. This command will print an IPv6-mapped IPv4 address, you can ignore the "`::ffff:`" at the start.
+
+If you explore the packets a little, you should see that the line printed when you sent packets to the server over IPv6 matches what you see in Wireshark whereas the packets sent over IPv4 involve different IP addresses and ports.
+
+**Note:** This is the only bit of the lab that involves IPv4... And you will want to put the capture filter back in place before moving on.
+
+# 2. Telnet
+
+In this exercise you are going to explore what a simple telnet connection looks like at the packet level. Telnet is a client/server protocol for accessing a virtual terminal across a network - think of it as similar to SSH, but we can see what is going on inside packets in using Wireshark. 
+
+We aren't going to use it to access a terminal though, we are going to watch part of a movie by telneting to `towel.blinkenlights.nl`.
+
+We find that this gives students an appreciation for how what they see on the wire can relate to what they see visually.
+
+❇️ 	Make sure that you have Wireshark open and running a capture on the network interface that corresponds to the labs network.
+
+❇️ 	Enter a display filter that only shows traffic sent to and from `towel.blinkenlights.nl`. **Tip:** display filters work with IP addresses, think how you might find the IPv6 address for this domain with the tools you have already used in this lab.
+
+❇️ 	In your WSL terminal, connect to the telnet server by typing telnet `towel.blinkenlights.nl`.
+Watch what happens in your terminal and in Wireshark.
+
+❇️ 	When you have watched a few frames, disconnect from Telnet by pressing `ctrl + ]` followed by `q <enter>`.
+
+
+Investigate the packet capture and explore the packets involved in establishing the connection and ending the connection.
+Also investigate the Telnet data packets and note how the contents relate to what you saw in the terminal. Don't spend more than 10-15 minutes on this.
+
+❓ 	Note down the display filter that you used.
+
+❓ 	Which transport layer protocol does Telnet use?
+
+❓ 	What was the film?
+
+❓ 	How many packets were involved in creating the Telnet connection (before the first displayed frame was sent)?
+
+❓ 	How many packets were involved in closing the connection?
+
+3. Traceroute
+
+Many students will have come across `traceroute` at some point. This exercise lets them see how the utility works at the packet level and explore how the Hop Limit/TTL works. These instructions are written for a Linux environment, you can adapt them for Windows or Mac without too much difficulty.
+
+You will be investigating the routing to five different hosts:
+
+    2a0c:5bc0:40:3e29::3
+    2a0c:5bc0:0:75::91
+    www.imperial.ac.uk
+    sown.org.uk
+    comp1323.m0nsa.com
+
+❇️ 	Make sure that you have Wireshark open and running a capture on the correct interface.
+
+❇️ 	Enter a display filter that only shows traffic sent to and from the five hosts.
+
+❇️ 	Verify that the display filter works by pinging each of the five hosts from your Linux terminal. This should be the only traffic that you see. **Tip:** You can apply multiple filters by using an OR operation. e.g. `ip.addr == 10.22.36.21 || ip.addr == 152.78.103.253 || ip.addr == 146.179.42.148` would show traffic for three IPv4 hosts.
+
+❓ 	Note down the display filter that you used.
+
+Traceroute works by sending probes with an increasing hop limit and looking for Time Exceeded responses from intermediate routers. It stops sending responses after it receives a response from the destination, but may send more requests than it needs. We will be using the IPv6 version of Traceroute (traceroute6) for this exercise. You may want to investigate the options that traceroute has by typing `traceroute6 --help` in your Linux terminal.
+
+❇️ 	Restart the current capture in Wireshark by clicking the "Restart current capture" button:
+Click "Continue without Saving" on the dialogue that pops up as we don't need the original capture.
+
+❇️ 	Run a traceroute to `2a0c:5bc0:0:75::91` from your Linux terminal by typing `traceroute6 -q1 2a0c:5bc0:0:75::91`.
+
+
+From this capture, you should be able to see how Traceroute behaves on Linux. Investigate the packets that you've captured in Wireshark, paying attention to how the Hop Limit in the IPv6 headers changes, the data sent by traceroute and to the contents of the ICMPv6 Time Exceeded messages.
+
+❓ 	Which protocol does Traceroute on Linux use by default?
+
+❓ 	What does traceroute include in the data field at the end of the packet?
+
+❓ 	What hostname does `2a0c:5bc0:0:75::91` have?
+
+❓ 	What does the "-q1" argument that we used mean?
+
+
+For completeness, we are going to have a quick look at how Windows handles traceroute:
+
+❇️ 	Open another Powershell tab or window (you can click "+" on the title bar of the window that has your Linux terminal).
+
+❇️ 	Run a traceroute to `2a0c:5bc0:0:75::91` from this terminal by typing `tracert 2a0c:5bc0:0:75::91`.
+
+
+Have a look at the packets you just captured. You should see that the Windows and Linux/Unix versions of Traceroute use different protocols by default. The Windows version has far fewer arguments and can be less flexible than the Linux/Unix version, but the default behaviour is likely to work for more destinations.
+
+❓ 	Which protocol does Traceroute on Windows use by default?
+
+❓ 	What does `tracert` include in the data field at the end of the packet?
+
+
+We are now going to move back to Linux and explore the rest of the destinations. 
+
+❇️ 	In your Linux terminal, run _traceroutes_ to the other three destinations. **Tip:** Don't forget to use traceroute6 rather than traceroute.
+
+❓ 	How many hops did it take to reach each destination?
+
+Look at the packet capture alongside the terminal output and try to figure out what is going on with any hops that have a "*" rather than a time. Also pay attention to the output in the terminal and think about what each of the _traceroutes_ is telling you about the structure of the network and where each host is. 
+
+You should have noticed that the _traceroute_ to `www.imperial.ac.uk` never received a response from the intended destination. Interestingly, it would have finished with the Windows version of _traceroute_. We can make the Linux/Unix version behave more like the Windows version by telling _traceroute_ to use the same protocol.
+
+❇️ 	In your Linux terminal, run a _traceroute_ to `www.imperial.ac.uk` using the same protocol as a Windows _traceroute_. **Tip:** `traceroute6 --help` will show you all of the possible arguments for _traceroute_. You will need to use sudo to run _traceroute_ as root for this part of the exercise.
+
+This _traceroute_ should have completed and you should be able to see the difference in how the two different protocols behave. Explore the structure of the packets sent by _traceroute_ and note how the data sent differs from ping.
+
+❓ 	Which argument did you have to use to make _traceroute_ complete with `www.imperial.ac.uk`?
+
+❓ 	What does _traceroute_ include in the data field at the end of the packet when you use this protocol?
+
+❓ 	Think about why `www.imperial.ac.uk` exhibits the behaviour it does with the default protocol used by _traceroute_.
+
+
+You should now have more of an idea of how Traceroute works and how Wireshark can help us to investigate the behaviour of network protocols.
