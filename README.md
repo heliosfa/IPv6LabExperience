@@ -57,8 +57,18 @@ We now need to install some pre-requisites:
 ❇️ 	In the Linux environment, enter `sudo apt update` and enter your password when prompted. This will update the package cache.
 ❇️ 	Install the dependencies for this lab by typing `sudo apt install traceroute python3 python3-scapy curl wget dnsutils telnet netcat-openbsd nmap sl`.
 
-If you don't have Wireshark installed on Windows, you can install it in WSL with `sudo apt install wireshark`. Note that you will want to allow non-superusers to be able to capture packets with Dumpcap (Select "yes" on the popup):
+We can check that everything is happy by typing `{ sleep 1; echo "bye"; } | nc -C comp1323.m0nsa.com 5666` into the Linux environment, which will give output similar to this:
+
+![nc output](nc.png)
+
+# 2. Wireshark
+
+We will be using Wireshark to inspect packets in this lab. Ideally you will have Wireshark installed natively. If you don't and you are using WSL, you can install it within WSL with `sudo apt install wireshark`. Note that you will want to allow non-superusers to be able to capture packets with Dumpcap (Select "yes" on the popup):
 
 ![Dumpcap config](dumpcap.png)
 
-We can check that everything is happy by typing `{ sleep 1; echo "bye"; } | nc -C comp1323.m0nsa.com 5666` into the Linux environment, which will give output similar to this:
+Before we can start capturing packets, we need to figure out which interface our traffic will be using.
+
+ ❇️ 	Open Wireshark and watch the graphs shown next to each interface for a moment. It should be the only real interface with a moving line next to it. If it's not clear, open your browser and go to fast.com and see which line shows traffic.
+
+ ![Wireshark interfaces](wireshark.png)
