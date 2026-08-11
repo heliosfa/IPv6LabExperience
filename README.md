@@ -245,6 +245,8 @@ You need to download the code for this lab in WSL. You can either clone this rep
 
 ❇️ 	Download the `simpleserver.py`, `simpleclient.py`, `simpleserverUDP.py`, `simpleclientUDP.py` and `simplegetaddrinfo.py` example files in the Linux environment. e.g. `wget https://raw.githubusercontent.com/heliosfa/IPv6LabExperience/simpleserver.py`
 
+**Note:** You may want to make these executable by running `chmod +x *.py` in the directory you downloaded them to.
+
 We will need a Python venv for installing packages later on, so let's create this now.
 
 ❇️ 	Enter `python3 -m venv n2venv`.
@@ -309,3 +311,34 @@ UDP supports two-way communication as well. Think about how you can change the c
 * the client prints the server response. 
 
 **Hint:** The Client holds the answer to a Server sending a message, and the Server holds the answer for the Client receiving a message.
+
+# 6. DNS
+
+Wireshark lets us look at DNS queries in some detail. In this exercise, you are going to explore DNS queries.
+
+❇️ 	Stop the `simpleserverUDP.py` and your Wireshark capture.
+
+❇️ 	Start a fresh Wireshark capture on the "any" interface and apply a display filter that only shows DNS queries for `www.imperial.ac.uk`
+
+
+`simplegetaddrinfo.py` does a couple of DNS lookups and prints the results to the terminal. Have a look at the code and then:
+
+❇️ 	Execute `simplegetaddrinfo.py`. 
+
+❓ 	What IPv4 and IPv6 addresses are printed for `poets-project.org`?
+
+❓ 	Do you see anything different when you run it a second time?
+
+
+Some hosts have more interesting DNS entries.
+
+❇️ 	Change your Wireshark display filter so that it only shows DNS queries for `google.com` or `microsoft.com`.
+
+❇️ 	Modify `simplegetaddrinfo.py` so that it resolves `google.com` or `microsoft.com` instead. Execute it once.
+
+
+You should see that a response for Google or Microsoft are markedly different to one for `poets-project.org`.
+
+❓ 	What is different about the response you receive for Google or Microsoft?
+
+❓ 	Do you see anything different when you run it a second time? How about a third and fourth time?
