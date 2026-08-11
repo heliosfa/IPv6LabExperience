@@ -48,3 +48,17 @@ Enter a username (your University username would be a good choice) and then a pa
 You now have Linux running on top of Windows with the same networking provision as the Windows host. We can check this by looking at the IP addresses shown on the post-installation welcome screen or by entering ip a. If the networking is configured correctly, then you should see IPv6 addresses that start with `2001:630:d0:...` like the screenshot below. 
 
 ![WSL window showing IPv6 Addresses](addresses.png)
+
+If you don't see IPv6 addresses and have the config in-place as `%USERPROFILE%\.wslconfig` (yes, the "." is important), then you need to restart the WSL instance. Close the WSL window and open a Powershell window. Type `wsl --shutdown`, and then re-open WSL by clicking the arrow to the right of your Powershell tab and then clicking IPv6Lab (you could also try pressing `ctrl + shift + 4` or `ctrl + shift + 5` and seeing what that does).
+
+❓ 	Note down the interface name that has the global address.
+
+We now need to install some pre-requisites:
+❇️ 	In the Linux environment, enter `sudo apt update` and enter your password when prompted. This will update the package cache.
+❇️ 	Install the dependencies for this lab by typing `sudo apt install traceroute python3 python3-scapy curl wget dnsutils telnet netcat-openbsd nmap sl`.
+
+If you don't have Wireshark installed on Windows, you can install it in WSL with `sudo apt install wireshark`. Note that you will want to allow non-superusers to be able to capture packets with Dumpcap (Select "yes" on the popup):
+
+![Dumpcap config](dumpcap.png)
+
+We can check that everything is happy by typing `{ sleep 1; echo "bye"; } | nc -C comp1323.m0nsa.com 5666` into the Linux environment, which will give output similar to this:
