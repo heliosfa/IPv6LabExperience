@@ -2,7 +2,7 @@
 
 This is an example of a basic networking lab that embraces the IPv6-first ethos of teaching computer networking to students. This is based on an amalgamation of two assessed lab that all Part I CS students do. 
 
-The lab is designed to run under WSL2 on Windows 11 (at lease 22H2) with somewhat limited permissions on the host. You should be able to make most of this work under Linux or MacOS.
+The lab is designed to run under WSL2 on Windows 11 (at least 22H2) with somewhat limited permissions on the host. You should be able to make most of this work under Linux or MacOS.
 
 The students are given learning outcomes focused on their use of Wireshark and sockets, but the lab exposes them to IPv6, routing, network tools, telnet and basic networking skills:
 
